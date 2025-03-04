@@ -578,7 +578,7 @@ function Home() {
                     {/* /.content */}
                     </div>
                     {/* /.content-wrapper */}
-                    </div>
+</div>
     </div>
   );
 }
