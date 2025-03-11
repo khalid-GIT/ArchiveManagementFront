@@ -1,0 +1,5 @@
+# Redirige toutes les requêtes vers index.html pour gérer la navigation côté client avec React
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]

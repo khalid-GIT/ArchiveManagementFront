@@ -1,26 +1,36 @@
-import React, {} from "react";
+import React, { useEffect } from "react";
+import {  Router,Routes, Route, useLocation, Navigate } from "react-router-dom";
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Header from './components/Header';
-import Home from './components/Home';
-import SideNav from './components/SideNav';
 
+import Header from './components/Header';
+import SideNav from './components/SideNav';
 import Footer from './components/Footer';
-import Content from './Content.js';
+import Content from "./Content.js";
+
+function DebugComponent() {
+  let location = useLocation();
+
+  useEffect(() => {
+    console.log("URL a changé :", location.pathname);
+  }, [location]);
+
+  return null; // Ce composant sert juste à afficher l'URL dans la console
+}
 
 function App() {
+  console.log('App is loaded');
   return (
     <div className="App">
-    <Router>
-        <Header/>
-        <Home/>
-        <SideNav/>
-        <Footer/>
-        
+     
+        <DebugComponent />
+        <Header />
+        <SideNav />
         <Content/>
-        
-      </Router>
-            </div>
+       
+
+        <Footer />
+     
+    </div>
   );
 }
 

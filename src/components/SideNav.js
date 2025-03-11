@@ -41,7 +41,7 @@ function SideNav() {
                        
                     <li className="nav-item">
                             
-                        <Link to="/TableTree" className="nav-link active">
+                        <Link to="/" className="nav-link active">
                             <i className="nav-icon fas fa-tachometer-alt" />
                             
                             <p>

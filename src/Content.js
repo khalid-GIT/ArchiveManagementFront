@@ -1,32 +1,20 @@
 import React, {} from "react";
+import {  Router,Routes, Route, useLocation, Navigate } from "react-router-dom";
 import TableTree from './components/TableTree.js'
-import { Switch,Route } from 'react-router-dom';
+import Home from './components/Home.js'
+
 
 function Content(){
 return (
-    <Switch>
-      <Route  path="/TableTree" element={TableTree} />
-      {/* <Route exact path="/getCities" component={Cities} />
-      <Route exact path="/getTransports" component={Transports} />
-      <Route exact path="/getRoles" component={Roles} />
-      <Route exact path="/getUsers" component={Users} />
-      <Route exact path="/getCustomers" component={Customers} />
-      <Route exact path="/getTicketings" component={Ticketings} />
-      <Route exact path="/getEvents" component={Events} />
-      <Route exact path="/getPrograms" component={Programs} />
-      <Route exact path="/getTypePrograms" component={TypePrograms} />
-      <Route exact path="/getDetailPrograms" component={DetailPrograms} />
-      <Route exact path="/getHotels" component={Hotels} />
-      <Route exact path="/getTypeChambres" component={RoomTypes} />
-      <Route exact path="/getTypeCompanys" component ={Companys}/>
-      <Route exact path="/getAirPlanType" component={AirPlanTypes} />
-      <Route exact path="/getPrograms" component={Programs} />
-      <Route exact path="/getReservationHotels" component={ReservationHotels}/>
-      <Route exact path="/getRegistrations" component={Registrations}/>
-      <Route exact component={Countries} />*/}
-      {/* <Route exact path="/logOut" component={Login} />  */}
-      {/* <Countries /> */}
-    </Switch>
+  
+   
+       <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/TableTree" element={<TableTree />} />
+          <Route path="*" element={<Navigate to="/" />} /> {/* Redirection pour les routes inconnues */}
+     
+      </Routes>
+  
   )
 }
 export default Content;
