@@ -1,8 +1,27 @@
 import React, { useState, useEffect } from "react";
 
-const TableTree = () => {
+const containerStyle = {
+  display: "flex",
+};
+
+const leftPanelStyle = {
+  width: "35%",
+  borderRight: "1px solid #ddd",
+  padding: "10px",
+  overflowY: "auto", // Pour le scroll si la liste est longue
+  height: "100vh",
+};
+
+const rightPanelStyle = {
+  width: "75%",
+  padding: "10px",
+};
+
+const TableTree = ({  documents }) => {
+  // const FolderDocuments = ({ folders, documents }) => {
   const [folders, setFolders] = useState([]);  // Liste des dossiers transformés en arbre
   const [expandedRows, setExpandedRows] = useState({});  // État des lignes ouvertes
+  const [selectedFolder, setSelectedFolder] = useState(null);
 
   // Charger les données depuis l'API
   useEffect(() => {
@@ -60,16 +79,38 @@ const TableTree = () => {
     }));
   };
 
+  // Fonction pour rendre les lignes des dossiers
+  // const renderRows = (folders) => {
+  //   return folders.map((folder, index) => (
+  //     <tr key={index} onClick={() => handleFolderClick(folder)}>
+  //       <td>{folder.name}</td>
+  //     </tr>
+  //   ));
+  // };
+
+  // Gérer la sélection d'un dossier
+  const handleFolderClick = (folder) => {
+    setSelectedFolder(folder);
+  };
+
+  // Récupérer les documents du dossier sélectionné
+  const getDocumentsForFolder = (folder) => {
+    return documents.filter(doc => doc.folderId === folder.id);
+  };
+
   // Fonction récursive pour afficher les dossiers et sous-dossiers
   const renderRows = (items, level = 0) => {
     return items.map((item) => (
       <React.Fragment key={item.id}>
         <tr onClick={() => toggleRow(item.id)} style={{ cursor: "pointer" }}>
-          <td style={{ paddingLeft: `${level * 20}px` }}>
+          <td >
+          <div style={{ paddingLeft: `${level * 20}px` }}>
             {item.children.length > 0 && (
-              <i className={`fas fa-caret-${expandedRows[item.id] ? "down" : "right"} fa-fw`}></i>
+              <i className={`fas fa-caret-${expandedRows[item.id] ? "up" : "right"} fa-fw`}></i>
             )}
-            📂 {item.name}
+         {item.name} 
+         </div>
+            
           </td>
         </tr>
         {expandedRows[item.id] && renderRows(item.children, level + 1)}
@@ -78,10 +119,10 @@ const TableTree = () => {
   };
 
   return (
-    <div className="content-wrapper">
+    <div className="container-fluid content-wrapper">
     <div className="row">
-      <div className="col-3">
-        {/* Menu latéral des dossiers */}
+      {/* Menu latéral des dossiers */}
+      <div className="col-md-2">
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">Dossiers</h3>
@@ -96,20 +137,30 @@ const TableTree = () => {
         </div>
       </div>
 
-      <div className="col-9">
-        {/* Zone pour afficher les documents du dossier sélectionné */}
+      {/* Tableau à droite */}
+      <div className="col-md-10">
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">Documents</h3>
           </div>
           <div className="card-body">
-            {/* Ici, on affichera les documents du dossier sélectionné */}
-            <p>Sélectionnez un dossier pour voir son contenu.</p>
+            {selectedFolder ? (
+              <>
+                <h4>Documents du dossier: {selectedFolder.name}</h4>
+                <ul>
+                  {getDocumentsForFolder(selectedFolder).map((doc, index) => (
+                    <li key={index}>{doc.name}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p>Sélectionnez un dossier pour voir son contenu.</p>
+            )}
           </div>
         </div>
       </div>
     </div>
-    </div>
+  </div>
   );
 };
 
