@@ -1,11 +1,32 @@
 import { useState, useEffect } from "react";
 import React from 'react';
+import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
-const TableTree = () => {
+ const TableTree = ({  onUpload }) => {
+
   const [folders, setFolders] = useState([]);
   const [expandedRows, setExpandedRows] = useState({});
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [documents, setDocuments] = useState([]); // Stockage des documents
+
+  //  const DocumentTable = ({ documents, onUpload }) => {
+    const [selectedFile, setSelectedFile] = useState(null);
+  
+    const handleFileChange = (event) => {
+      setSelectedFile(event.target.files[0]);
+    };
+  
+    const handleUpload = () => {
+      if (!selectedFile) {
+        alert("Veuillez sélectionner un fichier.");
+        return;
+      }
+      console.log("Uploading:", selectedFile.name);
+      onUpload(selectedFile);
+      setSelectedFile(null); // Réinitialiser l'input après l'upload
+    };
+ 
+  
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -34,6 +55,7 @@ const TableTree = () => {
 
   const fetchDocuments = async (folderId) => {
     try {
+      setDocuments([]);
       const response = await fetch(`https://localhost:7047/api/FileUpload/GetFilesByParent/${folderId}`, {
         method: "GET",
         headers: {
@@ -96,7 +118,20 @@ const TableTree = () => {
       </React.Fragment>
     ));
   };
-
+  const handleDownload = (doc) => {
+    console.log("Téléchargement de", doc.name);
+    // Logique de téléchargement ici
+  };
+  
+  const handleEdit = (doc) => {
+    console.log("Modification de", doc.name);
+    // Logique de modification ici
+  };
+  
+  const handleDelete = (doc) => {
+    console.log("Suppression de", doc.name);
+    // Logique de suppression ici
+  };
   return (
     <div className="container-fluid content-wrapper">
       <div className="row">
@@ -116,83 +151,93 @@ const TableTree = () => {
           </div>
         </div>
 
-        {/* Liste des documents
-        <div className="col-md-9">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Documents</h3>
-            </div>
-            <div className="card-body">
-              {selectedFolder ? (
+            <div className="col-md-9">
+       
+                 {/* /.card */}
+                  <div className="card">
+                    <div className="card-header">
+                            {selectedFolder ? (
+                          <>
+                          <h3 className="card-title">Documents du dossier : {selectedFolder.name}</h3>
+                          </>
+                          ) : (
+                            <p>Sélectionnez un dossier pour voir son contenu.</p>
+                          )}
+                      
+                    </div>
+                      {/* Upload File Section */}
+                      <div className="mb-3 d-flex justify-content-end">
+  <input type="file" className="form-control d-inline-block w-auto" onChange={handleFileChange} />
+  <button className="btn btn-primary ms-2" onClick={handleUpload}>
+    <FaUpload /> Upload
+  </button>
+</div>
+                    {/* /.card-header */}
+                    <div className="card-body">
+                    {selectedFolder ? (
                 <>
-                  <h4>Documents du dossier : {selectedFolder.name}</h4>
-                  <ul>
-                    {documents.length > 0 ? (
-                      documents.map((doc) => 
-                      <li key={doc.id}>{doc.name}</li>
-                    
-                    )
-                    ) : (
-                      <p>Aucun document trouvé.</p>
-                    )}
-                  </ul>
-                </>
-              ) : (
-                <p>Sélectionnez un dossier pour voir son contenu.</p>
-              )}
-            </div>
-          </div>
-        </div> */}
-
-<div className="col-md-9">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Documents</h3>
-            </div>
-            <div className="card-body">
-              {selectedFolder ? (
-                <>
-                  <h4>Documents du dossier : {selectedFolder.name}</h4>
-                  <ul>
-                    
-                      <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Nom</th>
-                          <th>Type</th>
-                          <th>Taille</th>
-                          <th>Date de création</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        
+                  {/* <h4>Documents du dossier : {selectedFolder.name}</h4> */}
+                      <table id="example1" className="table table-bordered table-striped">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Description(s)</th>
+                            <th>Path</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
                         {documents.map((doc, index) => (
                           <tr key={index}>
                             <td>{doc.name}</td>
                             <td>{doc.description}</td>
-                            <td>{(doc.size / 1024).toFixed(2)} KB</td>
-                            <td>{new Date(doc.createdAt).toLocaleDateString()}</td>
+                            <td>{doc.path}</td>
+                            <td>
+                              <button className="btn btn-success mx-1" onClick={() => handleDownload(doc)}>
+                                <FaDownload />
+                              </button>
+                              <button className="btn btn-primary mx-1" onClick={() => handleEdit(doc)}>
+                                <FaEdit />
+                              </button>
+                              <button className="btn btn-danger mx-1" onClick={() => handleDelete(doc)}>
+                                <FaTrash />
+                              </button>
+                            </td>
                           </tr>
                         ))}
-                      </tbody>
-                    </table>
-                    
-                  
-                      <p>Aucun document trouvé.</p>
-                    
-                  </ul>
-                </>
+                         
+                        </tbody>
+                        {/* <tfoot>
+                          <tr>
+                            <th>Rendering engine</th>
+                            <th>Browser</th>
+                            <th>Platform(s)</th>
+                            <th>Engine version</th>
+                            <th>CSS grade</th>
+                          </tr>
+                        </tfoot> */}
+                      </table>
+                      </>
               ) : (
-                <p>Sélectionnez un dossier pour voir son contenu.</p>
+                 <p></p>
               )}
-            </div>
-          </div>
-        </div> 
-       
+                    </div>
+                    {/* /.card-body */}
+                  </div>
+                  {/* /.card */}
+           
+                  </div>
+
+
       </div>
     </div>
   );
+
 };
 
+// Exemple de gestion de l'upload
+const handleUpload = (file) => {
+  console.log("Fichier uploadé:", file);
+  // Ajouter la logique pour envoyer le fichier au backend
+};
 export default TableTree;
