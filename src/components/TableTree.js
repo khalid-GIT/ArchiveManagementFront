@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useRef,useState, useEffect } from "react";
 import React from 'react';
 import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
- const TableTree = ({  onUpload }) => {
+ const TableTree = () => {
 
   const [folders, setFolders] = useState([]);
   const [expandedRows, setExpandedRows] = useState({});
@@ -11,23 +11,67 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
   //  const DocumentTable = ({ documents, onUpload }) => {
     const [selectedFile, setSelectedFile] = useState(null);
-  
+    const [selectedType, setSelectedType] = useState(""); // Stocke le type du fichier
+    const [description, setDescription] = useState(""); //
+    const fileInputRef = useRef(null);
+
     const handleFileChange = (event) => {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      
+      setSelectedFile(file);
+      console.log("Fichier sélectionné :", file);
     };
   
-    const handleUpload = () => {
+    // const handleUpload = () => {
+    //   if (!selectedFile) {
+    //     alert("Veuillez sélectionner un fichier.");
+    //     return;
+    //   }
+    //   console.log("Uploading:", selectedFile.name);
+    //   onUpload(selectedFile);
+    //   setSelectedFile(null); // Réinitialiser l'input après l'upload
+    // };
+    
+    const handleUpload = async () => {
       if (!selectedFile) {
         alert("Veuillez sélectionner un fichier.");
         return;
       }
-      console.log("Uploading:", selectedFile.name);
-      onUpload(selectedFile);
-      setSelectedFile(null); // Réinitialiser l'input après l'upload
+    alert(selectedFile.name)
+      const formData = new FormData();
+     
+      if (!selectedFolder) {
+        alert("Veuillez sélectionner un dossier.");
+        return;
+      }
+      alert(selectedFolder.id)
+      formData.append("file", selectedFile); // Ajout du fichier
+      formData.append("idparent", selectedFolder.id);
+      // try {
+        const response = await fetch("https://localhost:7047/api/FileUpload/Upload", {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Authorization": "Bearer TON_TOKEN",
+          },
+        });
+    
+        // if (!response.ok) {
+        //   throw new Error("Erreur lors de l'upload : " + response.statusText);
+        // }
+        console.log("Réponse complète du serveur :", response);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Erreur lors de l'upload : ${response.status} - ${errorText}`);
+        }
+        alert("Fichier uploadé avec succès !");
+        setSelectedFile(null);
+        fileInputRef.current.value = "";
+      // } catch (error) {
+      //   console.error("Erreur d'upload :", error);
+      //   alert("Échec de l'upload !");
+      // }
     };
- 
-  
-
   useEffect(() => {
     const fetchFolders = async () => {
       try {
@@ -105,7 +149,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
     return items.map((item) => (
       <React.Fragment key={item.id}>
         <tr onClick={() => toggleRow(item)} style={{ cursor: "pointer" }}>
-          <td>
+          <td className="w-25">
             <div style={{ paddingLeft: `${level * 20}px` }}>
               {item.children.length > 0 && (
                 <i className={`fas fa-caret-${expandedRows[item.id] ? "down" : "right"} fa-fw`}></i>
@@ -136,12 +180,12 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
     <div className="container-fluid content-wrapper">
       <div className="row">
         {/* Menu des dossiers */}
-        <div className="col-md-3">
+        <div className="col-md-3 w-25">
           <div className="card">
             <div className="card-header">
               <h3 className="card-title">Dossiers</h3>
             </div>
-            <div className="card-body p-0">
+            <div  className="card-body p-0 ">
               <table className="table table-hover">
                 <tbody>
                   {folders.length > 0 ? renderRows(folders) : <tr><td>Chargement...</td></tr>}
@@ -166,12 +210,12 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
                       
                     </div>
                       {/* Upload File Section */}
-                      <div className="mb-3 d-flex justify-content-end">
-  <input type="file" className="form-control d-inline-block w-auto" onChange={handleFileChange} />
-  <button className="btn btn-primary ms-2" onClick={handleUpload}>
-    <FaUpload /> Upload
-  </button>
-</div>
+                      <div className="d-flex justify-content-end align-items-center gap-2">
+                        <input type="file" className="form-control w-auto" ref={fileInputRef} onChange={handleFileChange} />
+                        <button className="btn btn-primary" onClick={handleUpload}>
+                          <FaUpload /> Upload
+                        </button>
+                      </div>
                     {/* /.card-header */}
                     <div className="card-body">
                     {selectedFolder ? (
@@ -180,8 +224,14 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
                       <table id="example1" className="table table-bordered table-striped">
                         <thead>
                           <tr>
+                          <th>Id</th>
                             <th>Name</th>
                             <th>Description(s)</th>
+                            <th>Date</th>
+                            <th>Tiers</th>
+                            <th>Mt. HT</th>
+                            <th>Mt. Tva</th>
+                            <th>Mt. TTC</th> 
                             <th>Path</th>
                             <th>Action</th>
                           </tr>
@@ -189,9 +239,15 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
                         <tbody>
                         {documents.map((doc, index) => (
                           <tr key={index}>
+                            <td>{doc.id}</td>
                             <td>{doc.name}</td>
-                            <td>{doc.description}</td>
-                            <td>{doc.path}</td>
+                            <td>"{doc.description}"</td>
+                            <td>"{doc.date}"</td>
+                            <td>"{doc.Tiersid}"</td>
+                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mht}"</td>
+                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mdt}"</td>
+                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mttc}"</td>
+                            <td>"{doc.path}"</td>
                             <td>
                               <button className="btn btn-success mx-1" onClick={() => handleDownload(doc)}>
                                 <FaDownload />
