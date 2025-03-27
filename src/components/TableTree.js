@@ -14,7 +14,8 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
     const [selectedType, setSelectedType] = useState(""); // Stocke le type du fichier
     const [description, setDescription] = useState(""); //
     const fileInputRef = useRef(null);
-
+    const [files, setFiles] = useState([]);
+    
     const handleFileChange = (event) => {
       const file = event.target.files[0];
       
@@ -39,20 +40,23 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
       }
     alert(selectedFile.name)
       const formData = new FormData();
-     
+    
+      formData.append("file", selectedFile);
       if (!selectedFolder) {
         alert("Veuillez sélectionner un dossier.");
         return;
       }
       alert(selectedFolder.id)
-      formData.append("file", selectedFile); // Ajout du fichier
-      formData.append("idparent", selectedFolder.id);
-      // try {
-        const response = await fetch("https://localhost:7047/api/FileUpload/Upload", {
+      // formData.append("file", selectedFile); // Ajout du fichier
+      // formData.append("idparent", selectedFolder.id);
+       try {
+        const response = await fetch('https://localhost:7047/api/FileUpload/Upload/', {
           method: "POST",
           body: formData,
           headers: {
             "Authorization": "Bearer TON_TOKEN",
+            "idParent": selectedFolder.id,        // Passer idParent via le header
+            "file": selectedFile 
           },
         });
     
@@ -66,14 +70,16 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
         }
         alert("Fichier uploadé avec succès !");
         setSelectedFile(null);
+        fetchDocuments(selectedFolder.id);
         fileInputRef.current.value = "";
-      // } catch (error) {
-      //   console.error("Erreur d'upload :", error);
-      //   alert("Échec de l'upload !");
-      // }
+      } catch (error) {
+        console.error("Erreur d'upload :", error);
+        alert("Échec de l'upload !");
+      }
     };
   useEffect(() => {
     const fetchFolders = async () => {
+      
       try {
         const response = await fetch("https://localhost:7047/api/ManageFolder/GetAllFolder", {
           method: "GET",
@@ -114,6 +120,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
       const data = await response.json();
       setDocuments(data);
+     
     } catch (error) {
       console.error("Erreur lors du chargement des documents :", error);
     }
@@ -149,7 +156,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
     return items.map((item) => (
       <React.Fragment key={item.id}>
         <tr onClick={() => toggleRow(item)} style={{ cursor: "pointer" }}>
-          <td className="w-25">
+          <td style={{ width: "100px", whiteSpace: "nowrap" }}>
             <div style={{ paddingLeft: `${level * 20}px` }}>
               {item.children.length > 0 && (
                 <i className={`fas fa-caret-${expandedRows[item.id] ? "down" : "right"} fa-fw`}></i>
@@ -172,12 +179,34 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
     // Logique de modification ici
   };
   
-  const handleDelete = (doc) => {
-    console.log("Suppression de", doc.name);
-    // Logique de suppression ici
+  const handleDelete = async (id) => {
+    
+    if (!window.confirm("Voulez-vous vraiment supprimer ce fichier ?")) return;
+    console.log("Tentative de suppression avec l'ID :", id);
+    console.log(`URL appelée : https://localhost:7047/api/FileUpload/DeleteFile/${id}`);
+    try {
+      const response = await fetch(`https://localhost:7047/api/FileUpload/DeleteFile/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": "Bearer TON_TOKEN", // Ajoute le token si nécessaire
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+  
+      alert("Fichier supprimé avec succès !");
+      fetchDocuments(selectedFolder.id);
+     // setFiles(files.filter(file => file.id !== id)); // Met à jour l'affichage
+     setFiles((prevFiles) => prevFiles.filter(file => file.id !== id));
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Échec de la suppression !");
+    }
   };
   return (
-    <div className="container-fluid content-wrapper">
+    // <div className="container-fluid content-wrapper">
       <div className="row">
         {/* Menu des dossiers */}
         <div className="col-md-3 w-25">
@@ -255,7 +284,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
                               <button className="btn btn-primary mx-1" onClick={() => handleEdit(doc)}>
                                 <FaEdit />
                               </button>
-                              <button className="btn btn-danger mx-1" onClick={() => handleDelete(doc)}>
+                              <button className="btn btn-danger mx-1" onClick={() => handleDelete(doc.id)}>
                                 <FaTrash />
                               </button>
                             </td>
@@ -286,7 +315,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
 
 
       </div>
-    </div>
+    // </div>
   );
 
 };

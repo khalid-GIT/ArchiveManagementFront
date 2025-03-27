@@ -36,3 +36,50 @@
     transform: rotate(360deg);
   }
 }
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px; /* Ajuste la largeur selon tes besoins */
+  background-color: #343a40; /* Exemple de fond */
+  padding: 0;
+  margin: 0;
+}
+
+.main-content {
+  flex-grow: 1; /* Prend le reste de l'espace */
+  padding: 0;
+  margin: 0;
+}
+
+.container-fluid,
+.row {
+  margin: 0;
+  padding: 0;
+}
+
+.table {
+  margin: 0;
+  width: 100%;
+}
+.mon-div {
+  margin-left: 10px; 
+  margin-right: -100x;
+    border: 2px solid black; /* Bordure visible */
+    padding: 10px; /* Espace intérieur */
+    width:auto; /* Occuper toute la largeur disponible */
+    min-height: 100vh; /* Hauteur minimale pour couvrir tout l'écran */
+    box-sizing: border-box; /* Inclure la bordure dans la largeur/hauteur */
+  
+}
+.mon-div- {
+  
+    border: 2px solid black; /* Bordure visible */
+   
+   
+    min-height: 100vh; /* Hauteur minimale pour couvrir tout l'écran */
+    box-sizing: border-box; /* Inclure la bordure dans la largeur/hauteur */
+  
+}

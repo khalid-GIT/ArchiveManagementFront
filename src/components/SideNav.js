@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 function SideNav() {
     
     return (
-        <div >
-            <div className="App">
+       
+          
+       <div className="App">
                 <aside className="main-sidebar sidebar-dark-primary elevation-4">
                 <a href="index3.html" className="brand-link">
                     <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" className="brand-image img-circle elevation-3" style={{opacity: '.8'}} />
@@ -153,8 +154,8 @@ function SideNav() {
                 </aside>
 
         </div>
-      </div>
-      
+    
+   
     );
 }
   

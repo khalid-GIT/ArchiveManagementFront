@@ -1,36 +1,45 @@
 import React, { useEffect } from "react";
-import {  Router,Routes, Route, useLocation, Navigate } from "react-router-dom";
+
 import './App.css';
 
-import Header from './components/Header';
+import Header from './components/Header.js';
 import SideNav from './components/SideNav';
 import Footer from './components/Footer';
 import Content from "./Content.js";
 
-function DebugComponent() {
-  let location = useLocation();
 
-  useEffect(() => {
-    console.log("URL a changé :", location.pathname);
-  }, [location]);
+// function DebugComponent() {
+//   let location = useLocation();
 
-  return null; // Ce composant sert juste à afficher l'URL dans la console
-}
+//   useEffect(() => {
+//     console.log("URL a changé :", location.pathname);
+//   }, [location]);
+
+//   return null; // Ce composant sert juste à afficher l'URL dans la console
+// }
 
 function App() {
   console.log('App is loaded');
   return (
-    <div className="App">
-     
-        <DebugComponent />
-        <Header />
-        <SideNav />
-        <Content/>
-       
-
-        <Footer />
-     
-    </div>
+  
+    <div className="container-fluid mon-div">
+    <div className="row">
+        {/* Menu des dossiers */}
+        <div className="col-md-2   mon-div-">
+         
+              <SideNav />
+              </div>
+              <div className="col-md-10 mon-div- ">
+          <Header /> 
+          <Content />  
+                  
+              <Footer />
+        </div>
+          </div>
+        
+          </div>
+      
+   
   );
 }
 
