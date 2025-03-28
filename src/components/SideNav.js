@@ -7,7 +7,7 @@ function SideNav() {
     return (
        
           
-       <div className="App">
+        <div className="row">
                 <aside className="main-sidebar sidebar-dark-primary elevation-4">
                 <a href="index3.html" className="brand-link">
                     <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" className="brand-image img-circle elevation-3" style={{opacity: '.8'}} />

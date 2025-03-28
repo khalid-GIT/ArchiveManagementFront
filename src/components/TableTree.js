@@ -1,6 +1,7 @@
 import { useRef,useState, useEffect } from "react";
 import React from 'react';
 import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
+import './TableTree.css';
 
  const TableTree = () => {
 
@@ -224,7 +225,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
           </div>
         </div>
 
-            <div className="col-md-9">
+            <div className="col-md-9 ">
        
                  {/* /.card */}
                   <div className="card">
@@ -239,7 +240,7 @@ import { FaDownload, FaEdit, FaTrash, FaUpload } from "react-icons/fa";
                       
                     </div>
                       {/* Upload File Section */}
-                      <div className="d-flex justify-content-end align-items-center gap-2">
+                      <div className="d-flex justify-content-end align-items-center gap-2  mon-div- ">
                         <input type="file" className="form-control w-auto" ref={fileInputRef} onChange={handleFileChange} />
                         <button className="btn btn-primary" onClick={handleUpload}>
                           <FaUpload /> Upload

@@ -25,11 +25,11 @@ function App() {
     <div className="container-fluid mon-div">
     <div className="row">
         {/* Menu des dossiers */}
-        <div className="col-md-2   mon-div-">
+        <div className="col-md-2 ">
          
               <SideNav />
               </div>
-              <div className="col-md-10 mon-div- ">
+              <div className="col-md-10 ">
           <Header /> 
           <Content />  
                   

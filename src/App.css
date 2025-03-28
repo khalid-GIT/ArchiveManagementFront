@@ -65,7 +65,7 @@
   width: 100%;
 }
 .mon-div {
-  margin-left: 10px; 
+  margin-left: 0x; 
   margin-right: -100x;
     border: 2px solid black; /* Bordure visible */
     padding: 10px; /* Espace intérieur */
@@ -74,12 +74,4 @@
     box-sizing: border-box; /* Inclure la bordure dans la largeur/hauteur */
   
 }
-.mon-div- {
-  
-    border: 2px solid black; /* Bordure visible */
-   
-   
-    min-height: 100vh; /* Hauteur minimale pour couvrir tout l'écran */
-    box-sizing: border-box; /* Inclure la bordure dans la largeur/hauteur */
-  
-}
+
