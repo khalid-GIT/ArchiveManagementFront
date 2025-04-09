@@ -91,6 +91,17 @@ function SideNav() {
                                 <p>Personnel</p>
                             </a>
                             </li>
+                            <li className="nav-item">
+                           
+                                <i className="far fa-circle nav-icon" /> 
+                                <li>
+                                    <Link to="/FolderManager" >
+                                        <p>Folder</p>
+                                    </Link>
+                            
+                                    </li>
+                           
+                            </li>
                         </ul>
                         </li>
                         <li className="nav-item menu-open">
@@ -103,7 +114,7 @@ function SideNav() {
                                 </p>
                         </Link>
                         <ul className="nav nav-treeview">
-                                                    <li>
+                                 <li>
                                     <Link to="/TableTree" >
                                         <p>Ventes</p>
                                     </Link>

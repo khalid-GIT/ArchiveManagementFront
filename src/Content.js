@@ -2,7 +2,7 @@ import React, {} from "react";
 import {  Router,Routes, Route, useLocation, Navigate } from "react-router-dom";
 import TableTree from './components/TableTree.js'
 import Home from './components/Home.js'
-
+import FolderManager from "./components/FolderManager.js";
 
 function Content(){
 return (
@@ -11,6 +11,7 @@ return (
        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/TableTree" element={<TableTree />} />
+          <Route path="/FolderManager" element={<FolderManager />} />
           <Route path="*" element={<Navigate to="/" />} /> {/* Redirection pour les routes inconnues */}
      
       </Routes>

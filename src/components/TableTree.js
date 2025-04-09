@@ -16,7 +16,10 @@ import './TableTree.css';
     const [description, setDescription] = useState(""); //
     const fileInputRef = useRef(null);
     const [files, setFiles] = useState([]);
-    
+    //Ajoutez un état pour stocker le document à modifier et pour gérer l’affichage du modal.
+    const [showModal, setShowModal] = useState(false);
+    const [selectedDoc, setSelectedDoc] = useState(null);
+
     const handleFileChange = (event) => {
       const file = event.target.files[0];
       
@@ -33,7 +36,55 @@ import './TableTree.css';
     //   onUpload(selectedFile);
     //   setSelectedFile(null); // Réinitialiser l'input après l'upload
     // };
+    //Model edit
+    //Cette fonction ouvrira le modal et remplira les champs avec les données du document sélectionné
+    const handleEdit = (doc) => {
+      setSelectedDoc(doc);
+      setShowModal(true);
+    };
+    //Ajoutez un modal pour modifier les informations du document.
+    const EditModal = ({ show, onClose, doc, onSave }) => {
+      const [formData, setFormData] = useState(doc || {});
     
+      useEffect(() => {
+        setFormData(doc || {});
+      }, [doc]);
+    
+      const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+      };
+    
+      const handleSubmit = () => {
+        onSave(formData);
+        onClose();
+      };
+    
+      if (!show) return null;
+    
+      return (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Modifier le Document</h2>
+            <label>Nom:</label>
+            <input type="text" name="name" value={formData.name || ''} onChange={handleChange} />
+            <label>Description:</label>
+            <input type="text" name="description" value={formData.description || ''} onChange={handleChange} />
+            <label>Date:</label>
+            <input type="date" name="date" value={formData.date || ''} onChange={handleChange} />
+            <button onClick={handleSubmit} className="btn btn-success">Enregistrer</button>
+            <button onClick={onClose} className="btn btn-secondary">Annuler</button>
+          </div>
+        </div>
+      );
+    };
+    //Créez une fonction pour mettre à jour l’état des documents après modification
+    const handleSave = (updatedDoc) => {
+      setDocuments((prevDocs) =>
+        prevDocs.map((doc) => (doc.id === updatedDoc.id ? updatedDoc : doc))
+      );
+    };
+    <EditModal show={showModal} onClose={() => setShowModal(false)} doc={selectedDoc} onSave={handleSave} />
+//fin Model
     const handleUpload = async () => {
       if (!selectedFile) {
         alert("Veuillez sélectionner un fichier.");
@@ -107,7 +158,7 @@ import './TableTree.css';
   const fetchDocuments = async (folderId) => {
     try {
       setDocuments([]);
-      const response = await fetch(`https://localhost:7047/api/FileUpload/GetFilesByParent/${folderId}`, {
+      const response = await fetch(`https://localhost:7047/api/Business/GetDocumentBusinessByParent/${folderId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -170,15 +221,45 @@ import './TableTree.css';
       </React.Fragment>
     ));
   };
-  const handleDownload = (doc) => {
-    console.log("Téléchargement de", doc.name);
-    // Logique de téléchargement ici
-  };
+  // const handleDownload = (doc) => {
+  //   console.log("Téléchargement de", doc.name);
+  //   // Logique de téléchargement icis
+  // };
+  const handleDownload = async (id) => {
+    try {
+      const response = await fetch(`https://localhost:7047/api/FileUpload/DownloadFile/${id}`, {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer TON_TOKEN", // Ajoute le token si nécessaire
+        },
+      });
   
-  const handleEdit = (doc) => {
-    console.log("Modification de", doc.name);
-    // Logique de modification ici
+      if (!response.ok) {
+        throw new Error("Erreur lors du téléchargement");
+      }
+  
+      // Convertir la réponse en Blob (données binaires)
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      // Créer un lien et déclencher le téléchargement
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = documents.name; // Nom du fichier téléchargé
+      document.body.appendChild(a);
+      a.click();
+  
+      // Nettoyage
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+  
+      alert("Téléchargement réussi !");
+    } catch (error) {
+      console.error("Erreur de téléchargement :", error);
+      alert("Échec du téléchargement !");
+    }
   };
+ 
   
   const handleDelete = async (id) => {
     
@@ -206,6 +287,7 @@ import './TableTree.css';
       alert("Échec de la suppression !");
     }
   };
+
   return (
     // <div className="container-fluid content-wrapper">
       <div className="row">
@@ -240,73 +322,73 @@ import './TableTree.css';
                       
                     </div>
                       {/* Upload File Section */}
-                      <div className="d-flex justify-content-end align-items-center gap-2  mon-div- ">
+                      <div className="d-flex justify-content-end align-items-center  ">
                         <input type="file" className="form-control w-auto" ref={fileInputRef} onChange={handleFileChange} />
                         <button className="btn btn-primary" onClick={handleUpload}>
                           <FaUpload /> Upload
                         </button>
                       </div>
                     {/* /.card-header */}
-                    <div className="card-body">
-                    {selectedFolder ? (
-                <>
-                  {/* <h4>Documents du dossier : {selectedFolder.name}</h4> */}
-                      <table id="example1" className="table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                          <th>Id</th>
-                            <th>Name</th>
-                            <th>Description(s)</th>
-                            <th>Date</th>
-                            <th>Tiers</th>
-                            <th>Mt. HT</th>
-                            <th>Mt. Tva</th>
-                            <th>Mt. TTC</th> 
-                            <th>Path</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        {documents.map((doc, index) => (
-                          <tr key={index}>
-                            <td>{doc.id}</td>
-                            <td>{doc.name}</td>
-                            <td>"{doc.description}"</td>
-                            <td>"{doc.date}"</td>
-                            <td>"{doc.Tiersid}"</td>
-                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mht}"</td>
-                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mdt}"</td>
-                            <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mttc}"</td>
-                            <td>"{doc.path}"</td>
-                            <td>
-                              <button className="btn btn-success mx-1" onClick={() => handleDownload(doc)}>
-                                <FaDownload />
-                              </button>
-                              <button className="btn btn-primary mx-1" onClick={() => handleEdit(doc)}>
-                                <FaEdit />
-                              </button>
-                              <button className="btn btn-danger mx-1" onClick={() => handleDelete(doc.id)}>
-                                <FaTrash />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                         
-                        </tbody>
-                        {/* <tfoot>
-                          <tr>
-                            <th>Rendering engine</th>
-                            <th>Browser</th>
-                            <th>Platform(s)</th>
-                            <th>Engine version</th>
-                            <th>CSS grade</th>
-                          </tr>
-                        </tfoot> */}
-                      </table>
-                      </>
-              ) : (
-                 <p></p>
-              )}
+                    <div className="card-body d-flex justify-content-end align-items-center">
+                              {selectedFolder ? (
+                          <>
+                            {/* <h4>Documents du dossier : {selectedFolder.name}</h4> */}
+                                <table id="example1" className="table justify-content-end table-bordered table-striped">
+                                  <thead>
+                                    <tr>
+                                    <th>Id</th>
+                                      <th>Name</th>
+                                      <th>Description(s)</th>
+                                      <th>Date</th>
+                                      <th>Tiers</th>
+                                      <th>Mt. HT</th>
+                                      <th>Mt. Tva</th>
+                                      <th>Mt. TTC</th> 
+                                      <th>Path</th>
+                                      <th>Action</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                  {documents.map((doc, index) => (
+                                    <tr key={index}>
+                                      <td>{doc.id}</td>
+                                      <td>{doc.name}</td>
+                                      <td>"{doc.description}"</td>
+                                      <td>"{doc.date}"</td>
+                                      <td>"{doc.Tiersid}"</td>
+                                      <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mht}"</td>
+                                      <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mdt}"</td>
+                                      <td style={{ width: "120px", fontSize: "18px", fontWeight: "bold" }}>"{doc.Mttc}"</td>
+                                      <td>"{doc.path}"</td>
+                                      <td>
+                                        <button className="btn btn-success mx-1" onClick={() => handleDownload(doc.id)}>
+                                          <FaDownload />
+                                        </button>
+                                        <button className="btn btn-primary mx-1" onClick={() => handleEdit(doc)}>
+                                          <FaEdit />
+                                        </button>
+                                        <button className="btn btn-danger mx-1" onClick={() => handleDelete(doc.id)}>
+                                          <FaTrash />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  
+                                  </tbody>
+                                  {/* <tfoot>
+                                    <tr>
+                                      <th>Rendering engine</th>
+                                      <th>Browser</th>
+                                      <th>Platform(s)</th>
+                                      <th>Engine version</th>
+                                      <th>CSS grade</th>
+                                    </tr>
+                                  </tfoot> */}
+                                </table>
+                                </>
+                        ) : (
+                          <p></p>
+                        )}
                     </div>
                     {/* /.card-body */}
                   </div>
@@ -321,9 +403,5 @@ import './TableTree.css';
 
 };
 
-// Exemple de gestion de l'upload
-const handleUpload = (file) => {
-  console.log("Fichier uploadé:", file);
-  // Ajouter la logique pour envoyer le fichier au backend
-};
+
 export default TableTree;
